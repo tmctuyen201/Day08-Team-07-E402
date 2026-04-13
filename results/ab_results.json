@@ -1,0 +1,198 @@
+{
+  "baseline": {
+    "faithfulness": 4.7,
+    "relevance": 3.4,
+    "context_recall": 5.0,
+    "completeness": 3.2
+  },
+  "variant": {
+    "faithfulness": 4.6,
+    "relevance": 3.6,
+    "context_recall": 5.0,
+    "completeness": 3.4
+  },
+  "baseline_rows": [
+    {
+      "id": "q01",
+      "category": "SLA",
+      "faithfulness": 5,
+      "relevance": 5,
+      "context_recall": 5,
+      "completeness": 4,
+      "answer": "[1] Theo support/sla-p1-2026.pdf: Ticket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n"
+    },
+    {
+      "id": "q02",
+      "category": "Refund",
+      "faithfulness": 5,
+      "relevance": 4,
+      "context_recall": 5,
+      "completeness": 5,
+      "answer": "[1] Theo policy/refund-v4.pdf: Khách hàng được quyền yêu cầu hoàn tiền khi đáp ứng đủ các điều kiện sau:\n- Sản phẩm bị lỗi do nhà sản xuất, không phải do người dùng.\n- Yêu cầu được gửi trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng.\n- Đơn hàng chưa được sử dụng hoặc chưa bị mở seal."
+    },
+    {
+      "id": "q03",
+      "category": "Access Control",
+      "faithfulness": 5,
+      "relevance": 3,
+      "context_recall": 5,
+      "completeness": 2,
+      "answer": "[1] Theo it/access-control-sop.md: Quyền phải được thu hồi trong các trường hợp:\n- Nhân viên nghỉ việc: Thu hồi ngay trong ngày cuối.\n- Hết hạn contract: Thu hồi đúng ngày hết hạn.\n- Chuyển bộ phận: Điều chỉnh trong 3 ngày làm việc."
+    },
+    {
+      "id": "q04",
+      "category": "Refund",
+      "faithfulness": 5,
+      "relevance": 5,
+      "context_recall": 5,
+      "completeness": 4,
+      "answer": "[1] Theo policy/refund-v4.pdf: Hoàn tiền — Điều kiện áp dụng:\nYêu cầu được gửi trong vòng 7 ngày kể từ thời điểm xác nhận đơn hàng.\n\nNgoại lệ không được hoàn tiền:\n- Sản phẩm thuộc danh mục hàng kỹ thuật số (license key, subscription).\n- Đơn hàng đã áp dụng mã giảm giá đặc biệt theo chương trình khuyến mãi Flash Sale.\n- Sản phẩm "
+    },
+    {
+      "id": "q05",
+      "category": "IT Helpdesk",
+      "faithfulness": 5,
+      "relevance": 5,
+      "context_recall": 5,
+      "completeness": 5,
+      "answer": "[1] Theo support/helpdesk-faq.md: Q: Tôi quên mật khẩu, phải làm gì?\nA: Truy cập https://sso.company.internal/reset hoặc liên hệ Helpdesk qua ext. 9000. Mật khẩu mới sẽ được gửi qua email công ty trong vòng 5 phút.\n\nQ: Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?\nA: Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở kh"
+    },
+    {
+      "id": "q06",
+      "category": "SLA",
+      "faithfulness": 5,
+      "relevance": 2,
+      "context_recall": 5,
+      "completeness": 1,
+      "answer": "[1] Theo support/sla-p1-2026.pdf: v2026.1 (2026-01-15): Cập nhật SLA P1 resolution từ 6 giờ xuống 4 giờ.\nv2025.3 (2025-09-01): Thêm quy trình escalation tự động.\nv2025.1 (2025-03-01): Phiên bản đầu tiên."
+    },
+    {
+      "id": "q07",
+      "category": "Access Control",
+      "faithfulness": 5,
+      "relevance": 3,
+      "context_recall": 5,
+      "completeness": 3,
+      "answer": "[1] Theo it/access-control-sop.md: Tài liệu này quy định quy trình cấp phép truy cập vào các hệ thống nội bộ của công ty.\nÁp dụng cho tất cả nhân viên, contractor, và third-party vendor."
+    },
+    {
+      "id": "q08",
+      "category": "HR Policy",
+      "faithfulness": 4,
+      "relevance": 4,
+      "context_recall": 5,
+      "completeness": 5,
+      "answer": "[1] Theo hr/leave-policy-2026.pdf: 4.1 Điều kiện remote:\n- Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần.\n- Team Lead phải phê duyệt lịch remote qua HR Portal.\n- Ngày onsite bắt buộc: Thứ 3 và Thứ 5 theo lịch team.\n\n4.2 Yêu cầu kỹ thuật khi remote:\n- Kết nối VPN bắt buộc khi làm việc với hệ thống nội bộ.\n- Camer"
+    },
+    {
+      "id": "q09",
+      "category": "Insufficient Context",
+      "faithfulness": 4,
+      "relevance": 1,
+      "context_recall": 5,
+      "completeness": 1,
+      "answer": "[1] Theo it/access-control-sop.md: Ticket system: Jira (project IT-ACCESS)\nIAM system: Okta\nAudit log: Splunk\nEmail: it-access@company.internal"
+    },
+    {
+      "id": "q10",
+      "category": "Refund",
+      "faithfulness": 4,
+      "relevance": 2,
+      "context_recall": 5,
+      "completeness": 2,
+      "answer": "[1] Theo it/access-control-sop.md: Escalation chỉ áp dụng khi cần thay đổi quyền hệ thống ngoài quy trình thông thường.\nVí dụ: Khẩn cấp trong sự cố P1, cần cấp quyền tạm thời để fix incident.\n\nQuy trình escalation khẩn cấp:\n1. On-call IT Admin có thể cấp quyền tạm thời (max 24 giờ) sau khi được Tech Lead phê duyệt bằng lời.\n2. Sau 24"
+    }
+  ],
+  "variant_rows": [
+    {
+      "id": "q01",
+      "category": "SLA",
+      "faithfulness": 5,
+      "relevance": 5,
+      "context_recall": 5,
+      "completeness": 4,
+      "answer": "[1] Theo support/sla-p1-2026.pdf: Ticket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n"
+    },
+    {
+      "id": "q02",
+      "category": "Refund",
+      "faithfulness": 5,
+      "relevance": 4,
+      "context_recall": 5,
+      "completeness": 5,
+      "answer": "[1] Theo policy/refund-v4.pdf: Khách hàng được quyền yêu cầu hoàn tiền khi đáp ứng đủ các điều kiện sau:\n- Sản phẩm bị lỗi do nhà sản xuất, không phải do người dùng.\n- Yêu cầu được gửi trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng.\n- Đơn hàng chưa được sử dụng hoặc chưa bị mở seal."
+    },
+    {
+      "id": "q03",
+      "category": "Access Control",
+      "faithfulness": 4,
+      "relevance": 3,
+      "context_recall": 5,
+      "completeness": 4,
+      "answer": "[1] Theo it/access-control-sop.md: Level 1 — Read Only:\nÁp dụng cho: Tất cả nhân viên mới trong 30 ngày đầu.\nPhê duyệt: Line Manager.\nThời gian xử lý: 1 ngày làm việc.\n\nLevel 2 — Standard Access:\nÁp dụng cho: Nhân viên chính thức đã qua thử việc.\nPhê duyệt: Line Manager + IT Admin.\nThời gian xử lý: 2 ngày làm việc.\n\nLevel 3 — Elevate"
+    },
+    {
+      "id": "q04",
+      "category": "Refund",
+      "faithfulness": 5,
+      "relevance": 5,
+      "context_recall": 5,
+      "completeness": 4,
+      "answer": "[1] Theo policy/refund-v4.pdf: Hoàn tiền — Điều kiện áp dụng:\nYêu cầu được gửi trong vòng 7 ngày kể từ thời điểm xác nhận đơn hàng.\n\nNgoại lệ không được hoàn tiền:\n- Sản phẩm thuộc danh mục hàng kỹ thuật số (license key, subscription).\n- Đơn hàng đã áp dụng mã giảm giá đặc biệt theo chương trình khuyến mãi Flash Sale.\n- Sản phẩm "
+    },
+    {
+      "id": "q05",
+      "category": "IT Helpdesk",
+      "faithfulness": 5,
+      "relevance": 5,
+      "context_recall": 5,
+      "completeness": 5,
+      "answer": "[1] Theo support/helpdesk-faq.md: Q: Tôi quên mật khẩu, phải làm gì?\nA: Truy cập https://sso.company.internal/reset hoặc liên hệ Helpdesk qua ext. 9000. Mật khẩu mới sẽ được gửi qua email công ty trong vòng 5 phút.\n\nQ: Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?\nA: Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở kh"
+    },
+    {
+      "id": "q06",
+      "category": "SLA",
+      "faithfulness": 5,
+      "relevance": 4,
+      "context_recall": 5,
+      "completeness": 1,
+      "answer": "[1] Theo it/access-control-sop.md: Escalation chỉ áp dụng khi cần thay đổi quyền hệ thống ngoài quy trình thông thường.\nVí dụ: Khẩn cấp trong sự cố P1, cần cấp quyền tạm thời để fix incident.\n\nQuy trình escalation khẩn cấp:\n1. On-call IT Admin có thể cấp quyền tạm thời (max 24 giờ) sau khi được Tech Lead phê duyệt bằng lời.\n2. Sau 24"
+    },
+    {
+      "id": "q07",
+      "category": "Access Control",
+      "faithfulness": 5,
+      "relevance": 3,
+      "context_recall": 5,
+      "completeness": 3,
+      "answer": "[1] Theo it/access-control-sop.md: Tài liệu này quy định quy trình cấp phép truy cập vào các hệ thống nội bộ của công ty.\nÁp dụng cho tất cả nhân viên, contractor, và third-party vendor."
+    },
+    {
+      "id": "q08",
+      "category": "HR Policy",
+      "faithfulness": 4,
+      "relevance": 4,
+      "context_recall": 5,
+      "completeness": 5,
+      "answer": "[1] Theo hr/leave-policy-2026.pdf: 4.1 Điều kiện remote:\n- Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần.\n- Team Lead phải phê duyệt lịch remote qua HR Portal.\n- Ngày onsite bắt buộc: Thứ 3 và Thứ 5 theo lịch team.\n\n4.2 Yêu cầu kỹ thuật khi remote:\n- Kết nối VPN bắt buộc khi làm việc với hệ thống nội bộ.\n- Camer"
+    },
+    {
+      "id": "q09",
+      "category": "Insufficient Context",
+      "faithfulness": 4,
+      "relevance": 1,
+      "context_recall": 5,
+      "completeness": 1,
+      "answer": "[1] Theo it/access-control-sop.md: Ticket system: Jira (project IT-ACCESS)\nIAM system: Okta\nAudit log: Splunk\nEmail: it-access@company.internal"
+    },
+    {
+      "id": "q10",
+      "category": "Refund",
+      "faithfulness": 4,
+      "relevance": 2,
+      "context_recall": 5,
+      "completeness": 2,
+      "answer": "[1] Theo it/access-control-sop.md: Escalation chỉ áp dụng khi cần thay đổi quyền hệ thống ngoài quy trình thông thường.\nVí dụ: Khẩn cấp trong sự cố P1, cần cấp quyền tạm thời để fix incident.\n\nQuy trình escalation khẩn cấp:\n1. On-call IT Admin có thể cấp quyền tạm thời (max 24 giờ) sau khi được Tech Lead phê duyệt bằng lời.\n2. Sau 24"
+    }
+  ]
+}
