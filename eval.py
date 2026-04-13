@@ -3,6 +3,13 @@ eval.py — Sprint 4: Evaluation & Scorecard
 ==========================================
 Chạy 10 test questions, chấm điểm 4 metrics, so sánh baseline vs variant.
 Hỗ trợ LLM-as-Judge (bonus) và chấm thủ công.
+
+Author: Eval Owner (NhungNTC) — Sprint 3 & 4
+Responsibilities:
+- Test questions design (data/test_questions.json)
+- Scorecard baseline & variant (results/scorecard_*.md)
+- A/B comparison (results/ab_comparison.csv)
+- LLM-as-Judge implementation
 """
 
 import json
