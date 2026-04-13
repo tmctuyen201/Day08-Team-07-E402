@@ -23,25 +23,28 @@ temperature = 0
 **Scorecard Baseline:**
 | Metric | Average Score |
 |--------|--------------|
-| Faithfulness | 3.40/5 |
-| Answer Relevance | 3.90/5 |
+| Faithfulness | 3.60/5 |
+| Answer Relevance | 4.00/5 |
 | Context Recall | 5.00/5 |
-| Completeness | 4.10/5 |
+| Completeness | 4.20/5 |
 
 **Câu hỏi yếu nhất (dự đoán từ phân tích corpus):**
 
 1. **q07 — "Approval Matrix để cấp quyền là tài liệu nào?"**
-   - Context recall thấp vì dense search dùng embedding similarity, có thể bỏ lỡ exact term "Approval Matrix" khi tài liệu đã đổi tên thành "Access Control SOP".
+   - Context recall có thể thấp vì dense search dùng embedding similarity, có thể bỏ lỡ exact term "Approval Matrix" khi tài liệu đã đổi tên thành "Access Control SOP".
    - Đây là alias query — điểm yếu kinh điển của pure dense retrieval.
+   - Kết quả thực tế: Cả baseline và variant đều Relevance=1, Completeness=1 vì pipeline abstain (không tìm thấy "Approval Matrix" trong tài liệu).
 
 2. **q09 — "ERR-403-AUTH là lỗi gì?"**
    - Không có thông tin trong docs → pipeline phải abstain.
    - Dense có thể retrieve các chunk về authentication nhưng không có exact answer.
    - Rủi ro hallucination cao nếu prompt không đủ grounding.
+   - Kết quả thực tế: Cả baseline và variant đều Faithfulness=1, Relevance=1 vì abstain đúng nhưng quá ngắn gọn.
 
 3. **q06 — "Escalation trong sự cố P1 diễn ra như thế nào?"**
    - Cần retrieve đúng section về escalation trong sla_p1_2026.txt.
-   - Dense thường tốt với câu này nhưng cần kiểm tra.
+   - Dense thường tốt với câu này.
+   - Kết quả thực tế: Baseline Completeness=5 (đúng), Variant Completeness=1 (sai hoàn toàn - retrieve từ access_control_sop thay vì sla_p1_2026).
 
 **Giả thuyết nguyên nhân (Error Tree):**
 - [x] Retrieval: Dense bỏ lỡ exact keyword / alias (q07, q09)
@@ -76,30 +79,38 @@ sparse_weight = 0.4
 **Scorecard Variant 1:**
 | Metric | Baseline | Variant 1 | Delta |
 |--------|----------|-----------|-------|
-| Faithfulness | 3.40/5 | 3.70/5 | +0.30 |
-| Answer Relevance | 3.90/5 | 4.00/5 | +0.10 |
+| Faithfulness | 3.60/5 | 3.20/5 | **-0.40** |
+| Answer Relevance | 4.00/5 | 3.90/5 | **-0.10** |
 | Context Recall | 5.00/5 | 5.00/5 | +0.00 |
-| Completeness | 4.10/5 | 3.90/5 | -0.20 |
+| Completeness | 4.20/5 | 3.90/5 | **-0.30** |
 
 **Nhận xét:**
-Hybrid cải thiện Faithfulness (+0.30) và Answer Relevance (+0.10). Context Recall đạt ceiling 5.00/5 ở cả hai — corpus nhỏ 29 chunks nên dense đã đủ tốt.
+Hybrid **KÉM HƠN** baseline ở tất cả metrics chính. Faithfulness giảm -0.40, Answer Relevance giảm -0.10, Completeness giảm -0.30. Context Recall đạt ceiling 5.00/5 ở cả hai — corpus nhỏ 29 chunks nên dense đã đủ tốt.
 
-Câu cải thiện rõ nhất: q07 (Approval Matrix alias) — Faithfulness tăng 3→5 vì BM25 bắt được exact term "Approval Matrix" trong ghi chú tài liệu. q03, q04, q09 cũng cải thiện.
+Câu kém hơn rõ nhất: 
+- **q06** (P1 escalation): Completeness giảm 5→1. Hybrid retrieve chunk từ access_control_sop.txt về "cấp quyền tạm thời 24 giờ" thay vì sla_p1_2026.txt về "escalate lên Senior Engineer trong 10 phút". BM25 bắt từ "escalation" xuất hiện nhiều trong access_control_sop, RRF fusion kéo sai chunk vào top-3.
+- **q03** (Level 3 approval): Faithfulness giảm 2→1.
+- **q10** (VIP refund): Faithfulness giảm 3→1.
 
-Câu kém hơn: q06 (P1 escalation) — hybrid mang về chunk từ access_control_sop thay vì sla_p1_2026, Completeness giảm 4→1. BM25 noise kéo sai chunk vào top-3 khi query có từ "escalation" xuất hiện ở cả hai tài liệu.
+Câu cải thiện: Không có câu nào cải thiện rõ ràng. q01, q02, q05, q08 giữ nguyên điểm. q07, q09 vẫn abstain đúng ở cả hai mode.
 
 **Kết luận:**
-Hybrid tốt hơn baseline về Faithfulness (+0.30) và Answer Relevance (+0.10). Bằng chứng: q07 Faithfulness 3→5, q03/q04/q09 cải thiện. Trade-off: Completeness giảm -0.20 do BM25 noise ở q06. Nếu cần tối ưu Completeness, bước tiếp theo là thêm cross-encoder rerank để lọc noise từ BM25.
+Hybrid KÉM HƠN baseline (-0.40 Faithfulness, -0.30 Completeness). Với corpus nhỏ 29 chunks, baseline dense đã đạt Context Recall 5.00/5 (retrieve đúng 100% expected sources). Thêm BM25 tạo ra nhiều noise hơn là cải thiện vì:
+1. BM25 bắt exact keyword nhưng không hiểu ngữ nghĩa → kéo sai chunk (ví dụ: "escalation" trong access_control vs sla)
+2. Corpus nhỏ → dense embedding đã đủ để phân biệt các tài liệu
+3. RRF fusion với sparse_weight=0.4 quá cao cho corpus này
+
+**Quyết định cuối cùng: Sử dụng BASELINE (dense) cho production.** Hybrid chỉ nên dùng khi corpus >100 chunks hoặc có nhiều exact keyword/alias không thể handle bằng embedding.
 
 ---
 
 ## Tóm tắt học được
 
 1. **Lỗi phổ biến nhất trong pipeline này là gì?**
-   Faithfulness thấp (3.40/5 baseline) — LLM-as-Judge phát hiện một số câu trả lời có thông tin không hoàn toàn grounded vào retrieved context (đặc biệt q03, q06). Nguyên nhân: model đôi khi thêm chi tiết từ model knowledge dù prompt yêu cầu evidence-only.
+   Faithfulness thấp (3.60/5 baseline, 3.20/5 hybrid) — LLM-as-Judge phát hiện một số câu trả lời có thông tin không hoàn toàn grounded vào retrieved context (đặc biệt q03 Faithfulness=2, q06 Faithfulness=2). Nguyên nhân: model đôi khi thêm chi tiết từ model knowledge dù prompt yêu cầu evidence-only. Hybrid làm tệ hơn vì BM25 kéo sai chunk, khiến LLM generate từ context không liên quan.
 
 2. **Biến nào có tác động lớn nhất tới chất lượng?**
-   Retrieval strategy: hybrid cải thiện Faithfulness (+0.30) và Answer Relevance (+0.10) so với dense. Tuy nhiên có trade-off: Completeness giảm -0.20 do BM25 noise ở q06. Chunking strategy (section-based) là nền tảng — Context Recall đạt 5.00/5 ở cả hai mode nhờ chunk không bị cắt giữa điều khoản.
+   Retrieval strategy: hybrid **KÉM HƠN** baseline (-0.40 Faithfulness, -0.30 Completeness). Với corpus nhỏ 29 chunks, dense đã đủ tốt (Context Recall 5.00/5). Thêm BM25 tạo noise vì bắt exact keyword không hiểu ngữ nghĩa. Chunking strategy (section-based) là nền tảng quan trọng nhất — Context Recall đạt 5.00/5 ở cả hai mode nhờ chunk không bị cắt giữa điều khoản.
 
 3. **Nếu có thêm 1 giờ, nhóm sẽ thử gì tiếp theo?**
-   Thêm cross-encoder rerank sau hybrid. Kết quả eval cho thấy q06 Completeness giảm 4→1 ở hybrid vì BM25 kéo chunk sai vào top-3. Cross-encoder sẽ chấm lại từng cặp (query, chunk) và loại bỏ noise, giữ được lợi ích của hybrid mà không mất Completeness.
+   Thêm cross-encoder rerank sau hybrid để lọc BM25 noise. Kết quả eval cho thấy q06 Completeness giảm 5→1, q03 Faithfulness giảm 2→1, q10 Faithfulness giảm 3→1 vì BM25 kéo chunk sai vào top-3. Cross-encoder sẽ chấm lại từng cặp (query, chunk) và loại bỏ noise, giữ được lợi ích của hybrid (bắt exact term) mà không mất Faithfulness và Completeness. Hoặc đơn giản hơn: chỉ dùng dense cho corpus <50 chunks, chỉ bật hybrid khi corpus lớn hơn.

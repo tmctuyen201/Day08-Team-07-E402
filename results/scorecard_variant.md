@@ -1,5 +1,5 @@
 # Scorecard: variant_hybrid
-Generated: 2026-04-13 14:53
+Generated: 2026-04-13 16:15
 
 ## Summary
 
@@ -16,19 +16,19 @@ Generated: 2026-04-13 14:53
 |----|----------|----------|----------|--------|----------|-------|
 | q01 | SLA | 5 | 5 | 5 | 5 | Every claim in the answer is directly supported by the retri |
 | q02 | Refund | 5 | 5 | 5 | 5 | Every claim in the answer is directly supported by the retri |
-| q03 | Access Control | 2 | 5 | 5 | 5 | The answer mentions Level 3 access and its approval process, |
-| q04 | Refund | 4 | 4 | 5 | 3 | The answer accurately states that digital products are non-r |
-| q05 | IT Helpdesk | 3 | 5 | 5 | 5 | The answer about the account being locked after 5 failed log |
-| q06 | SLA | 3 | 5 | 5 | 1 | The answer includes some details about the escalation proces |
-| q07 | Access Control | 3 | 1 | 5 | 1 | The answer correctly identifies that the Approval Matrix is  |
+| q03 | Access Control | 1 | 5 | 5 | 5 | The answer mentions Level 3 access and requires approvals th |
+| q04 | Refund | 4 | 4 | 5 | 3 | The answer accurately reflects the refund policy for digital |
+| q05 | IT Helpdesk | 3 | 5 | 5 | 5 | The answer about account locking and unlocking is mostly gro |
+| q06 | SLA | 2 | 5 | 5 | 1 | The answer introduces details about ticketing and logging th |
+| q07 | Access Control | 5 | 1 | 5 | 1 | The answer accurately states that information about the Appr |
 | q08 | HR Policy | 5 | 5 | 5 | 5 | Every claim in the answer is directly supported by the retri |
-| q09 | Insufficient Context | 1 | 1 | 5 | 5 | The answer about the error ERR-403-AUTH is not supported by  |
-| q10 | Refund | 1 | 3 | 5 | 4 | The answer claims information about a refund process for VIP |
+| q09 | Insufficient Context | 1 | 1 | 5 | 4 | The answer mentions an error code and handling instructions  |
+| q10 | Refund | 1 | 3 | 5 | 5 | The model answer makes a claim about VIP customers that is n |
 
 ## Answers
 
 ### [q01] SLA xử lý ticket P1 là bao lâu?
-**Answer:** SLA xử lý ticket P1 là 4 giờ để khắc phục và 15 phút để phản hồi ban đầu kể từ khi ticket được tạo [1].
+**Answer:** SLA xử lý ticket P1 là 4 giờ cho việc khắc phục (resolution) và phản hồi ban đầu trong 15 phút kể từ khi ticket được tạo [1].
 
 **Expected:** Ticket P1 có SLA phản hồi ban đầu 15 phút và thời gian xử lý (resolution) là 4 giờ.
 
@@ -42,7 +42,7 @@ Generated: 2026-04-13 14:53
 ---
 
 ### [q03] Ai phải phê duyệt để cấp quyền Level 3?
-**Answer:** Để cấp quyền Level 3, cần có sự phê duyệt của Line Manager, IT Admin và IT Security [2].
+**Answer:** Để cấp quyền Level 3, cần có sự phê duyệt của Line Manager, IT Admin và IT Security [1].
 
 **Expected:** Level 3 (Elevated Access) cần phê duyệt từ Line Manager, IT Admin, và IT Security.
 
@@ -63,7 +63,11 @@ Generated: 2026-04-13 14:53
 ---
 
 ### [q06] Escalation trong sự cố P1 diễn ra như thế nào?
-**Answer:** Escalation trong sự cố P1 diễn ra như sau: On-call IT Admin có thể cấp quyền tạm thời (tối đa 24 giờ) sau khi được Tech Lead phê duyệt bằng lời. Sau 24 giờ, phải có ticket chính thức hoặc quyền sẽ bị thu hồi tự động. Tất cả quyền tạm thời phải được ghi log vào hệ thống Security Audit [1].
+**Answer:** Escalation trong sự cố P1 diễn ra theo quy trình khẩn cấp như sau: 
+
+1. On-call IT Admin có thể cấp quyền tạm thời (tối đa 24 giờ) sau khi được Tech Lead phê duyệt bằng lời.
+2. Sau 24 giờ, phải có ticket chính thức hoặc quyền sẽ bị thu hồi tự động.
+3. Tất cả quyền tạm thời phải được ghi log vào hệ thống Security Audit [1].
 
 **Expected:** Ticket P1 tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút sau khi tạo ticket.
 
@@ -77,7 +81,7 @@ Generated: 2026-04-13 14:53
 ---
 
 ### [q08] Nhân viên được làm remote tối đa mấy ngày mỗi tuần?
-**Answer:** Nhân viên được làm remote tối đa 2 ngày mỗi tuần sau khi hoàn thành thời gian thử việc, và lịch remote phải được phê duyệt bởi Team Lead qua HR Portal [1].
+**Answer:** Nhân viên được làm remote tối đa 2 ngày mỗi tuần sau khi hoàn thành probation period, và lịch remote phải được Team Lead phê duyệt qua HR Portal [1].
 
 **Expected:** Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần, với điều kiện được Team Lead phê duyệt.
 
@@ -91,7 +95,7 @@ Generated: 2026-04-13 14:53
 ---
 
 ### [q10] Nếu cần hoàn tiền khẩn cấp cho khách hàng VIP, quy trình có khác không?
-**Answer:** Thông tin về quy trình hoàn tiền khẩn cấp cho khách hàng VIP không có trong các tài liệu được cung cấp.
+**Answer:** Thông tin về quy trình hoàn tiền khẩn cấp cho khách hàng VIP không có trong tài liệu được cung cấp.
 
 **Expected:** Tài liệu chính sách hoàn tiền không đề cập đến quy trình đặc biệt cho khách hàng VIP. Theo chính sách hiện hành, tất cả yêu cầu hoàn tiền đều theo cùng quy trình tiêu chuẩn trong 3-5 ngày làm việc.
 

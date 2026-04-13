@@ -28,16 +28,16 @@ Implement LLM-as-Judge cho 3/4 metrics để tự động hóa evaluation. Conte
 
 | Metric | Baseline (Dense) | Variant (Hybrid) | Delta |
 |--------|-----------------|-----------------|-------|
-| Faithfulness | 3.40/5 | 3.70/5 | +0.30 |
-| Answer Relevance | 3.90/5 | 4.00/5 | +0.10 |
+| Faithfulness | 3.60/5 | 3.20/5 | **-0.40** |
+| Answer Relevance | 4.00/5 | 3.90/5 | **-0.10** |
 | Context Recall | 5.00/5 | 5.00/5 | +0.00 |
-| Completeness | 4.10/5 | 3.90/5 | -0.20 |
+| Completeness | 4.20/5 | 3.90/5 | **-0.30** |
 
-**Câu hỏi cải thiện rõ nhất:** q07 (Approval Matrix alias query) — hybrid Faithfulness tăng từ 3→5 vì BM25 bắt được exact term "Approval Matrix" trong ghi chú tài liệu, giúp pipeline abstain đúng hơn. q03, q04, q09 cũng cải thiện nhờ hybrid retrieve đúng chunk hơn.
+**Câu hỏi kém hơn rõ nhất ở variant:** q06 (P1 escalation) — hybrid Completeness giảm từ 5→1 vì BM25 retrieve chunk từ access_control_sop.txt về "cấp quyền tạm thời 24 giờ" thay vì sla_p1_2026.txt về "escalate lên Senior Engineer trong 10 phút". Từ "escalation" xuất hiện ở cả hai tài liệu, BM25 không phân biệt được ngữ nghĩa. q03 Faithfulness giảm 2→1, q10 Faithfulness giảm 3→1 cũng do BM25 noise.
 
-**Câu hỏi kém hơn ở variant:** q06 (P1 escalation) — hybrid mang về chunk từ access_control_sop thay vì sla_p1_2026, làm Completeness giảm từ 4→1. Đây là trường hợp BM25 noise kéo sai chunk vào top-3.
+**Câu hỏi không cải thiện:** q07 (Approval Matrix alias query) và q09 (ERR-403-AUTH abstain) — cả baseline và variant đều abstain đúng với điểm tương tự. Không có câu nào cải thiện rõ ràng ở variant.
 
-**Nhận xét tổng thể:** Hybrid cải thiện Faithfulness (+0.30) và Answer Relevance (+0.10), nhưng giảm nhẹ Completeness (-0.20) do BM25 đôi khi mang về chunk ít liên quan về ngữ nghĩa. Context Recall đạt ceiling 5.00/5 ở cả hai — corpus nhỏ 29 chunks nên dense đã đủ tốt để retrieve đúng source.
+**Nhận xét tổng thể:** Hybrid **KÉM HƠN** baseline ở tất cả metrics. Với corpus nhỏ 29 chunks, baseline dense đã đạt Context Recall 5.00/5 (retrieve đúng 100% expected sources). Thêm BM25 tạo ra nhiều noise hơn là cải thiện vì BM25 bắt exact keyword nhưng không hiểu ngữ nghĩa. **Quyết định: Sử dụng baseline (dense) cho production.**
 
 ---
 
