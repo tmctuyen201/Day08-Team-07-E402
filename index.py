@@ -38,6 +38,8 @@ CHUNK_OVERLAP = 80     # tokens overlap giữa các chunk
 
 # Embedding provider: "openai" hoặc "local"
 EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "local")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 
 # =============================================================================
@@ -147,7 +149,6 @@ def _split_by_paragraph(
             "metadata": {**base_metadata, "section": section},
         }]
 
-    # Split theo paragraph trước
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 
     chunks = []
@@ -155,22 +156,23 @@ def _split_by_paragraph(
     prev_overlap = ""
 
     for para in paragraphs:
-        candidate = (prev_overlap + "\n\n" + current_chunk).strip() if prev_overlap else current_chunk
-        if len(candidate) + len(para) + 2 <= chunk_chars:
+        if len(current_chunk) + len(para) + 2 <= chunk_chars:
             current_chunk = (current_chunk + "\n\n" + para).strip() if current_chunk else para
         else:
             if current_chunk:
+                # Ghép overlap từ chunk trước vào đầu chunk hiện tại
+                full_text = (prev_overlap.strip() + "\n\n" + current_chunk).strip() if prev_overlap else current_chunk
                 chunks.append({
-                    "text": current_chunk,
+                    "text": full_text,
                     "metadata": {**base_metadata, "section": section},
                 })
-                # Lấy overlap từ cuối chunk hiện tại
                 prev_overlap = current_chunk[-overlap_chars:] if len(current_chunk) > overlap_chars else current_chunk
             current_chunk = para
 
     if current_chunk:
+        full_text = (prev_overlap.strip() + "\n\n" + current_chunk).strip() if prev_overlap else current_chunk
         chunks.append({
-            "text": current_chunk,
+            "text": full_text,
             "metadata": {**base_metadata, "section": section},
         })
 
@@ -196,10 +198,10 @@ def get_embedding(text: str) -> List[float]:
 
     if EMBEDDING_PROVIDER == "openai":
         from openai import OpenAI
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI(api_key=API_KEY)
         response = client.embeddings.create(
             input=text,
-            model="text-embedding-3-small"
+            model=EMBEDDING_MODEL
         )
         return response.data[0].embedding
     else:
