@@ -38,6 +38,8 @@ CHUNK_OVERLAP = 80     # tokens overlap giữa các chunk
 
 # Embedding provider: "openai" hoặc "local"
 EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "local")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 
 # =============================================================================
@@ -58,22 +60,37 @@ def preprocess_document(raw_text: str, filepath: str) -> Dict[str, Any]:
     }
     content_lines = []
     header_done = False
+    
+    # Dùng list để giữ title nếu nó là dòng đầu tiên
+    for i, line in enumerate(lines):
+        clean_line = line.strip()
+        if not clean_line:
+            if header_done:
+                content_lines.append(line)
+            continue
 
-    for line in lines:
         if not header_done:
-            if line.startswith("Source:"):
-                metadata["source"] = line.replace("Source:", "").strip()
-            elif line.startswith("Department:"):
-                metadata["department"] = line.replace("Department:", "").strip()
-            elif line.startswith("Effective Date:"):
-                metadata["effective_date"] = line.replace("Effective Date:", "").strip()
-            elif line.startswith("Access:"):
-                metadata["access"] = line.replace("Access:", "").strip()
-            elif line.startswith("==="):
+            # Luôn giữ dòng đầu tiên nếu nó có vẻ là tiêu đề (viết hoa hoặc không phải metadata)
+            if i == 0 and not clean_line.startswith(("Source:", "Department:", "Effective Date:", "Access:")):
+                content_lines.append(line)
+                continue
+
+            if clean_line.startswith("Source:"):
+                metadata["source"] = clean_line.replace("Source:", "").strip()
+            elif clean_line.startswith("Department:"):
+                metadata["department"] = clean_line.replace("Department:", "").strip()
+            elif clean_line.startswith("Effective Date:"):
+                metadata["effective_date"] = clean_line.replace("Effective Date:", "").strip()
+            elif clean_line.startswith("Access:"):
+                metadata["access"] = clean_line.replace("Access:", "").strip()
+            elif clean_line.startswith("==="):
                 header_done = True
                 content_lines.append(line)
-            elif line.strip() == "" or line.isupper():
-                continue
+            else:
+                # Nếu gặp dòng không phải metadata và chưa có ===, coi như bắt đầu nội dung
+                # trừ khi nó là dòng trống (đã check ở trên)
+                header_done = True
+                content_lines.append(line)
         else:
             content_lines.append(line)
 
@@ -140,39 +157,51 @@ def _split_by_paragraph(
 ) -> List[Dict[str, Any]]:
     """
     Split text theo paragraph với overlap. Ưu tiên cắt tại ranh giới paragraph.
+    Nếu một paragraph vẫn quá dài, sẽ cắt nhỏ tiếp theo độ dài ký tự.
     """
-    if len(text) <= chunk_chars:
-        return [{
-            "text": text,
-            "metadata": {**base_metadata, "section": section},
-        }]
-
-    # Split theo paragraph trước
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+    
+    # Nếu không có paragraph nào, xử lý text như một khối
+    if not paragraphs and text.strip():
+        paragraphs = [text.strip()]
 
     chunks = []
-    current_chunk = ""
-    prev_overlap = ""
-
-    for para in paragraphs:
-        candidate = (prev_overlap + "\n\n" + current_chunk).strip() if prev_overlap else current_chunk
-        if len(candidate) + len(para) + 2 <= chunk_chars:
-            current_chunk = (current_chunk + "\n\n" + para).strip() if current_chunk else para
-        else:
-            if current_chunk:
-                chunks.append({
-                    "text": current_chunk,
-                    "metadata": {**base_metadata, "section": section},
-                })
-                # Lấy overlap từ cuối chunk hiện tại
-                prev_overlap = current_chunk[-overlap_chars:] if len(current_chunk) > overlap_chars else current_chunk
-            current_chunk = para
-
-    if current_chunk:
+    current_chunk_text = ""
+    
+    def add_chunk(content):
+        nonlocal current_chunk_text
+        # Lấy overlap từ chunk cuối cùng đã thêm
+        prev_text = chunks[-1]["text"] if chunks else ""
+        overlap = prev_text[-overlap_chars:] if len(prev_text) > overlap_chars else prev_text
+        
+        full_text = (overlap.strip() + "\n\n" + content).strip() if overlap else content
         chunks.append({
-            "text": current_chunk,
+            "text": full_text,
             "metadata": {**base_metadata, "section": section},
         })
+
+    for para in paragraphs:
+        # Nếu một paragraph đơn lẻ quá dài, cắt nhỏ nó ra
+        if len(para) > chunk_chars:
+            # Add current_chunk_text if not empty
+            if current_chunk_text:
+                add_chunk(current_chunk_text)
+                current_chunk_text = ""
+            
+            # Chia nhỏ paragraph dài
+            for i in range(0, len(para), chunk_chars - overlap_chars):
+                sub_para = para[i:i + chunk_chars]
+                add_chunk(sub_para)
+            continue
+
+        if len(current_chunk_text) + len(para) + 2 <= chunk_chars:
+            current_chunk_text = (current_chunk_text + "\n\n" + para).strip() if current_chunk_text else para
+        else:
+            add_chunk(current_chunk_text)
+            current_chunk_text = para
+
+    if current_chunk_text:
+        add_chunk(current_chunk_text)
 
     return chunks if chunks else [{
         "text": text,
@@ -196,10 +225,10 @@ def get_embedding(text: str) -> List[float]:
 
     if EMBEDDING_PROVIDER == "openai":
         from openai import OpenAI
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI(api_key=API_KEY)
         response = client.embeddings.create(
             input=text,
-            model="text-embedding-3-small"
+            model=EMBEDDING_MODEL
         )
         return response.data[0].embedding
     else:
@@ -207,8 +236,8 @@ def get_embedding(text: str) -> List[float]:
         import torch
         from transformers import AutoTokenizer, AutoModel
         if _embedding_model is None:
-            print("  [Embedding] Loading model (pytorch only)...")
-            model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+            print(f"  [Embedding] Loading model {EMBEDDING_MODEL} (pytorch only)...")
+            model_name = EMBEDDING_MODEL if EMBEDDING_PROVIDER != "openai" else "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
             tokenizer = AutoTokenizer.from_pretrained(model_name)
             model = AutoModel.from_pretrained(model_name)
             model.eval()
@@ -226,6 +255,25 @@ def get_embedding(text: str) -> List[float]:
             # Normalize
             embedding = torch.nn.functional.normalize(embedding, p=2, dim=1)
         return embedding[0].tolist()
+
+# Hỗ trợ đọc nhiều định dạng file (txt, pdf, docx) nếu cần mở rộng sau này    
+
+def read_file(filepath: Path) -> str:
+    if filepath.suffix == ".txt":
+        return filepath.read_text(encoding="utf-8")
+
+    elif filepath.suffix == ".pdf":
+        from pypdf import PdfReader
+        reader = PdfReader(filepath)
+        return "\n".join(page.extract_text() or "" for page in reader.pages)
+
+    elif filepath.suffix == ".docx":
+        import docx
+        doc = docx.Document(filepath)
+        return "\n".join(p.text for p in doc.paragraphs)
+
+    else:
+        raise ValueError(f"Unsupported file type: {filepath}")
 
 
 def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None:
@@ -249,7 +297,10 @@ def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None
     )
 
     total_chunks = 0
-    doc_files = list(docs_dir.glob("*.txt"))
+    # Tìm kiếm tất cả các file hỗ trợ
+    doc_files = []
+    for ext in ["*.txt", "*.pdf", "*.docx"]:
+        doc_files.extend(list(docs_dir.glob(ext)))
 
     if not doc_files:
         print(f"Không tìm thấy file .txt trong {docs_dir}")
@@ -257,7 +308,7 @@ def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None
 
     for filepath in doc_files:
         print(f"  Processing: {filepath.name}")
-        raw_text = filepath.read_text(encoding="utf-8")
+        raw_text = read_file(filepath)
 
         doc = preprocess_document(raw_text, str(filepath))
         chunks = chunk_document(doc)
