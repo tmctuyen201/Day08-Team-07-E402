@@ -229,6 +229,25 @@ def get_embedding(text: str) -> List[float]:
             embedding = torch.nn.functional.normalize(embedding, p=2, dim=1)
         return embedding[0].tolist()
 
+# Hỗ trợ đọc nhiều định dạng file (txt, pdf, docx) nếu cần mở rộng sau này    
+
+def read_file(filepath: Path) -> str:
+    if filepath.suffix == ".txt":
+        return filepath.read_text(encoding="utf-8")
+
+    elif filepath.suffix == ".pdf":
+        from pypdf import PdfReader
+        reader = PdfReader(filepath)
+        return "\n".join(page.extract_text() or "" for page in reader.pages)
+
+    elif filepath.suffix == ".docx":
+        import docx
+        doc = docx.Document(filepath)
+        return "\n".join(p.text for p in doc.paragraphs)
+
+    else:
+        raise ValueError(f"Unsupported file type: {filepath}")
+
 
 def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None:
     """
@@ -259,7 +278,7 @@ def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None
 
     for filepath in doc_files:
         print(f"  Processing: {filepath.name}")
-        raw_text = filepath.read_text(encoding="utf-8")
+        raw_text = read_file(filepath)
 
         doc = preprocess_document(raw_text, str(filepath))
         chunks = chunk_document(doc)
